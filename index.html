@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<meta name="theme-color" content="#050505">
+
+<link rel="manifest" href="manifest.json">
+
+<title>USB TERMINAL</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: #050505;
+    color: #e5e5e5;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    overflow: hidden;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+#header {
+    height: 48px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 15px;
+
+    background: #101010;
+
+    border-bottom:
+        1px solid #292929;
+}
+
+#title {
+    font-size: 15px;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+#platform {
+    margin-left: auto;
+
+    color: #666;
+
+    font-size: 10px;
+}
+
+
+/* =========================
+   TERMINAL
+========================= */
+
+#terminal {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 15px;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.line {
+    min-height: 23px;
+}
+
+.system {
+    color: #858585;
+}
+
+.sui {
+    color: #ffffff;
+
+    font-weight: bold;
+}
+
+.error {
+    color: #ff6666;
+}
+
+.success {
+    color: #78d98a;
+}
+
+.command {
+    color: #d5d5d5;
+}
+
+
+/* =========================
+   INPUT
+========================= */
+
+#inputbar {
+    min-height: 55px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    padding:
+        8px 12px;
+
+    background: #0d0d0d;
+
+    border-top:
+        1px solid #292929;
+}
+
+#prompt {
+    color: #cfcfcf;
+
+    font-size: 14px;
+
+    margin-right: 8px;
+
+    white-space: nowrap;
+}
+
+#command {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 38px;
+
+    border: 0;
+    outline: none;
+
+    background: transparent;
+
+    color: #fff;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    font-size: 15px;
+
+    caret-color: #fff;
+}
+
+#command::placeholder {
+    color: #555;
+}
+
+
+/* =========================
+   INSTALL BUTTON
+========================= */
+
+#installButton {
+    display: none;
+
+    position: fixed;
+
+    right: 12px;
+    bottom: 72px;
+
+    z-index: 10;
+
+    background: #171717;
+
+    color: #fff;
+
+    border:
+        1px solid #444;
+
+    border-radius: 6px;
+
+    padding:
+        11px 14px;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    font-weight: bold;
+
+    font-size: 12px;
+}
+
+#installButton.show {
+    display: block;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    #header {
+        height: 44px;
+    }
+
+    #title {
+        font-size: 13px;
+    }
+
+    #platform {
+        font-size: 9px;
+    }
+
+    #terminal {
+        padding: 12px;
+
+        font-size: 13px;
+    }
+
+    #inputbar {
+        min-height: 53px;
+    }
+
+    #prompt {
+        font-size: 13px;
+    }
+
+    #command {
+        font-size: 14px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div id="app">
+
+    <header id="header">
+
+        <div id="title">
+            USB TERMINAL
+        </div>
+
+        <div id="platform">
+            ANDROID
+        </div>
+
+    </header>
+
+
+    <main id="terminal"></main>
+
+
+    <div id="inputbar">
+
+        <div id="prompt">
+            SUI&gt;
+        </div>
+
+        <input
+            id="command"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="command">
+
+    </div>
+
+</div>
+
+
+<button id="installButton">
+    INSTALL
+</button>
+
+
+<script>
+
+/* ==========================================
+   USB TERMINAL
+   Android PWA
+========================================== */
+
+const terminal =
+    document.getElementById("terminal");
+
+const commandInput =
+    document.getElementById("command");
+
+const installButton =
+    document.getElementById("installButton");
+
+
+let history = [];
+
+let historyIndex = -1;
+
+
+/* ==========================================
+   PRINT
+========================================== */
+
+function print(text = "", className = "") {
+
+    const line =
+        document.createElement("div");
+
+    line.className =
+        "line " + className;
+
+    line.textContent =
+        text;
+
+    terminal.appendChild(line);
+
+    terminal.scrollTop =
+        terminal.scrollHeight;
+}
+
+
+/* ==========================================
+   STARTUP
+========================================== */
+
+function startup() {
+
+    print(
+`USB TERMINAL
+ANDROID PWA EDITION
+
+--------------------------------
+USB TERMINAL SYSTEM READY
+--------------------------------`,
+        "system"
+    );
+
+    print("");
+
+    print(
+        "SUI TERMINAL ONLINE",
+        "sui"
+    );
+
+    print("");
+
+    print(
+        'Type "help" for available commands.'
+    );
+
+    print("");
+
+    print(
+        "SUI>"
+    );
+}
+
+
+/* ==========================================
+   COMMAND
+========================================== */
+
+function execute(command) {
+
+    const raw =
+        command.trim();
+
+    if (!raw) {
+        return;
+    }
+
+
+    print(
+        "SUI> " + raw,
+        "command"
+    );
+
+
+    history.push(raw);
+
+    historyIndex =
+        history.length;
+
+
+    const cmd =
+        raw.toLowerCase();
+
+
+    /* =========================
+       HELP
+    ========================= */
+
+    if (cmd === "help") {
+
+        print(
+`AVAILABLE COMMANDS
+
+help
+clear
+version
+status
+usb
+sui`
+        );
+
+        return;
+    }
+
+
+    /* =========================
+       CLEAR
+    ========================= */
+
+    if (cmd === "clear") {
+
+        terminal.innerHTML = "";
+
+        return;
+    }
+
+
+    /* =========================
+       VERSION
+    ========================= */
+
+    if (cmd === "version") {
+
+        print(
+`USB TERMINAL
+
+Android PWA Edition
+Version 1.0
+
+SUI TERMINAL SYSTEM`
+        );
+
+        return;
+    }
+
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    if (cmd === "status") {
+
+        print(
+`SYSTEM STATUS
+
+TERMINAL : ONLINE
+PLATFORM : ANDROID
+PWA      : ACTIVE
+SUI      : ONLINE`
+        );
+
+        return;
+    }
+
+
+    /* =========================
+       USB
+    ========================= */
+
+    if (cmd === "usb") {
+
+        print(
+`USB STATUS
+
+USB TERMINAL MODE
+ANDROID USB / OTG
+
+Browser environment detected.
+
+Direct system-level USB
+control is unavailable here.
+
+TERMINAL : ONLINE`
+        );
+
+        return;
+    }
+
+
+    /* =========================
+       SUI
+    ========================= */
+
+    if (cmd === "sui") {
+
+        print(
+`SUI SYSTEM
+
+S U I
+
+SUI TERMINAL ACTIVE
+
+SUIIIIIIIIIIIIIIIII
+
+USB TERMINAL
+ANDROID PWA EDITION`,
+            "sui"
+        );
+
+        return;
+    }
+
+
+    /* =========================
+       UNKNOWN
+    ========================= */
+
+    print(
+        "UNKNOWN COMMAND: " + raw,
+        "error"
+    );
+
+    print(
+        'Type "help" for available commands.'
+    );
+}
+
+
+/* ==========================================
+   KEYBOARD
+========================================== */
+
+commandInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        /* ENTER */
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            const command =
+                commandInput.value;
+
+            commandInput.value = "";
+
+            execute(command);
+
+            return;
+        }
+
+
+        /* UP */
+
+        if (event.key === "ArrowUp") {
+
+            event.preventDefault();
+
+            if (history.length === 0) {
+                return;
+            }
+
+            historyIndex--;
+
+            if (historyIndex < 0) {
+                historyIndex = 0;
+            }
+
+            commandInput.value =
+                history[historyIndex];
+
+            return;
+        }
+
+
+        /* DOWN */
+
+        if (event.key === "ArrowDown") {
+
+            event.preventDefault();
+
+            if (history.length === 0) {
+                return;
+            }
+
+            historyIndex++;
+
+            if (
+                historyIndex >=
+                history.length
+            ) {
+
+                historyIndex =
+                    history.length;
+
+                commandInput.value = "";
+
+            } else {
+
+                commandInput.value =
+                    history[historyIndex];
+            }
+        }
+
+    }
+);
+
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+terminal.addEventListener(
+    "click",
+    function() {
+
+        commandInput.focus();
+
+    }
+);
+
+
+/* ==========================================
+   SERVICE WORKER
+========================================== */
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        function() {
+
+            navigator.serviceWorker
+                .register("./sw.js")
+                .then(
+                    function() {
+
+                        console.log(
+                            "SUI SERVICE WORKER ONLINE"
+                        );
+
+                    }
+                )
+                .catch(
+                    function(error) {
+
+                        console.log(
+                            "SERVICE WORKER ERROR",
+                            error
+                        );
+
+                    }
+                );
+
+        }
+    );
+}
+
+
+/* ==========================================
+   PWA INSTALL
+========================================== */
+
+let deferredPrompt = null;
+
+
+window.addEventListener(
+    "beforeinstallprompt",
+    function(event) {
+
+        event.preventDefault();
+
+        deferredPrompt =
+            event;
+
+        installButton
+            .classList
+            .add("show");
+
+    }
+);
+
+
+installButton.addEventListener(
+    "click",
+    async function() {
+
+        if (!deferredPrompt) {
+            return;
+        }
+
+        deferredPrompt.prompt();
+
+        await deferredPrompt.userChoice;
+
+        deferredPrompt = null;
+
+        installButton
+            .classList
+            .remove("show");
+
+    }
+);
+
+
+window.addEventListener(
+    "appinstalled",
+    function() {
+
+        installButton
+            .classList
+            .remove("show");
+
+        print(
+            "PWA INSTALLED",
+            "success"
+        );
+
+    }
+);
+
+
+/* ==========================================
+   START
+========================================== */
+
+startup();
+
+setTimeout(
+    function() {
+
+        commandInput.focus();
+
+    },
+    300
+);
+
+</script>
+
+</body>
+</html>
