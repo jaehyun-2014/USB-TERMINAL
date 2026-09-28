@@ -52,6 +52,10 @@ body{overflow:hidden}
     cursor:text;
 }
 .line{margin:0}
+.line-cyan{color:#4dd0e1}
+.line-green{color:#39ff14;text-shadow:0 0 4px #39ff14}
+.line-yellow{color:#ffd54f}
+.line-red{color:#ff6b6b}
 .command{color:#fff}
 #inputArea{
     display:flex;
@@ -141,17 +145,17 @@ function updatePrompt(){
     prompt.textContent=currentPath+">";
 }
 
-function print(text=""){
+function print(text="",type=""){
     const line=document.createElement("div");
-    line.className="line";
+    line.className="line"+(type?" line-"+type:"");
     line.textContent=text;
     terminal.appendChild(line);
     terminal.scrollTop=terminal.scrollHeight;
 }
 
 function boot(){
-    print("DHRAIL Control [Version 10.0.26100.1]");
-    print("(c) control OS Corporation. All rights reserved.");
+    print("DHRAIL Control [Version 10.0.26100.1]","cyan");
+    print("(c) control OS Corporation. All rights reserved.","cyan");
     print("");
     updatePrompt();
 }
@@ -227,6 +231,7 @@ function commandHelp(){
     print("VER      Displays the Windows version.");
     print("WHOAMI   Displays the current user.");
     print("HOSTNAME Displays the computer name.");
+    print("SUI      SUIIIIIIIIIIIII!");
     print("");
 }
 
@@ -234,7 +239,7 @@ function execute(raw){
     const command=raw.trim();
     if(!command) return;
 
-    print(currentPath+">"+raw);
+    print(currentPath+">"+raw,"cyan");
 
     history.push(raw);
     historyIndex=history.length;
@@ -267,7 +272,7 @@ function execute(raw){
             if(folders[newPath]){
                 currentPath=newPath;
             }else{
-                print("The system cannot find the path specified.");
+                print("The system cannot find the path specified.","yellow");
             }
             print("");
             break;
@@ -307,9 +312,14 @@ function execute(raw){
             print("");
             break;
 
+        case "sui":
+            print("SUIIIIIIIIIIIII!","green");
+            print("");
+            break;
+
         default:
-            print("'"+raw+"' is not recognized as an internal or external command,");
-            print("operable program or batch file.");
+            print("'"+raw+"' is not recognized as an internal or external command,","yellow");
+            print("operable program or batch file.","yellow");
             print("");
             break;
     }
@@ -341,7 +351,7 @@ input.addEventListener("keydown",event=>{
     if(event.key==="Tab"){
         event.preventDefault();
         const value=input.value.toLowerCase();
-        const names=["help","cls","clear","dir","cd","echo","ver","whoami","hostname","date","time","color"];
+        const names=["help","cls","clear","dir","cd","echo","ver","whoami","hostname","date","time","color","sui"];
         const match=names.find(n=>n.startsWith(value));
         if(match) input.value=match;
     }
