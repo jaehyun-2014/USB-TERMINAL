@@ -51,14 +51,14 @@ body {
 }
 
 #logo {
-    font-size: 28px;
+    font-size: 29px;
     font-weight: 900;
     letter-spacing: 1px;
 }
 
 #logoUSB {
     color: #39ff14;
-    text-shadow: 0 0 8px rgba(57,255,20,0.45);
+    text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
 }
 
 #logoCMD {
@@ -68,7 +68,7 @@ body {
 #platform {
     color: #888888;
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 900;
 }
 
 /* TERMINAL */
@@ -201,6 +201,7 @@ body {
 <div id="app">
 
     <header id="header">
+
         <div id="logo">
             <span id="logoUSB">USB</span><span id="logoCMD">-CMD</span>
         </div>
@@ -208,12 +209,15 @@ body {
         <div id="platform">
             ANDROID
         </div>
+
     </header>
 
     <main id="terminal"></main>
 
     <div id="inputArea">
+
         <span id="prompt">CMD&gt;</span>
+
         <input
             id="commandInput"
             type="text"
@@ -222,6 +226,7 @@ body {
             spellcheck="false"
             autofocus
         >
+
     </div>
 
 </div>
@@ -237,18 +242,23 @@ const installButton = document.getElementById("installButton");
 let history = [];
 let historyIndex = -1;
 
+
+/* 출력 */
+
 function print(text = "", type = "") {
 
     const line = document.createElement("div");
 
     line.className = "line " + type;
-
     line.textContent = text;
 
     terminal.appendChild(line);
 
     terminal.scrollTop = terminal.scrollHeight;
 }
+
+
+/* 시작 화면 */
 
 function boot() {
 
@@ -260,6 +270,9 @@ function boot() {
     print("");
 
 }
+
+
+/* 명령어 실행 */
 
 function execute(command) {
 
@@ -274,7 +287,9 @@ function execute(command) {
     history.push(command);
     historyIndex = history.length;
 
+
     switch (cmd) {
+
 
         case "help":
 
@@ -286,7 +301,7 @@ function execute(command) {
             print("version  - Show USB-CMD version");
             print("status   - Show terminal status");
             print("usb      - Show USB information");
-            print("sui      - SUI command");
+            print("sui      - Fun command");
             print("");
 
             break;
@@ -340,14 +355,14 @@ function execute(command) {
             break;
 
 
+        /*
+         * 유일하게 SUI가 등장하는 명령어
+         */
+
         case "sui":
 
             print("");
-            print("SUI COMMAND", "success");
-            print("");
-            print("S U I");
-            print("");
-            print("SUIIIIIIIIIIIIIIIII");
+            print("SUI");
             print("");
 
             break;
@@ -361,10 +376,16 @@ function execute(command) {
             print("");
 
             break;
+
     }
+
 }
 
+
+/* 키보드 */
+
 input.addEventListener("keydown", function(event) {
+
 
     if (event.key === "Enter") {
 
@@ -373,7 +394,9 @@ input.addEventListener("keydown", function(event) {
         input.value = "";
 
         execute(command);
+
     }
+
 
     else if (event.key === "ArrowUp") {
 
@@ -390,7 +413,9 @@ input.addEventListener("keydown", function(event) {
         }
 
         input.value = history[historyIndex] || "";
+
     }
+
 
     else if (event.key === "ArrowDown") {
 
@@ -408,21 +433,32 @@ input.addEventListener("keydown", function(event) {
 
             input.value = "";
 
-        } else {
+        }
+
+        else {
 
             input.value = history[historyIndex];
+
         }
+
     }
 
 });
 
+
+/* 화면 클릭하면 입력창 활성화 */
+
 document.addEventListener("click", function() {
+
     input.focus();
+
 });
 
-/* PWA */
+
+/* PWA 설치 */
 
 let deferredPrompt = null;
+
 
 window.addEventListener("beforeinstallprompt", function(event) {
 
@@ -431,7 +467,9 @@ window.addEventListener("beforeinstallprompt", function(event) {
     deferredPrompt = event;
 
     installButton.style.display = "block";
+
 });
+
 
 installButton.addEventListener("click", async function() {
 
@@ -446,14 +484,18 @@ installButton.addEventListener("click", async function() {
     deferredPrompt = null;
 
     installButton.style.display = "none";
+
 });
 
+
+/* Service Worker */
 
 if ("serviceWorker" in navigator) {
 
     window.addEventListener("load", function() {
 
-        navigator.serviceWorker.register("./sw.js")
+        navigator.serviceWorker
+            .register("./sw.js")
             .catch(function(error) {
 
                 console.log(
@@ -466,6 +508,7 @@ if ("serviceWorker" in navigator) {
     });
 
 }
+
 
 boot();
 
