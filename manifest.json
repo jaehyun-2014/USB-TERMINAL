@@ -1,11 +1,11 @@
 {
-  "name": "USB TERMINAL",
-  "short_name": "USB TERMINAL",
-  "description": "SUI USB Terminal for Android",
+  "name": "Ctrl_CMD",
+  "short_name": "Ctrl_CMD",
+  "description": "A browser-based command prompt inspired by Windows CMD.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
