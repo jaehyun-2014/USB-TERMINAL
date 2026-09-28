@@ -1,6 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="5" result="blur"/>
+    <feMerge>
+      <feMergeNode in="blur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+</defs>
 <rect width="512" height="512" rx="70" fill="#000000"/>
 <rect x="35" y="35" width="442" height="442" rx="35" fill="#050505" stroke="#555555" stroke-width="8"/>
-<text x="256" y="245" text-anchor="middle" font-family="monospace" font-size="76" font-weight="900" fill="#ffffff">C:\&gt;_</text>
+<text x="256" y="245" text-anchor="middle" font-family="monospace" font-size="76" font-weight="900" fill="#39ff14" filter="url(#glow)">C:&gt;_</text>
 <text x="256" y="325" text-anchor="middle" font-family="monospace" font-size="42" font-weight="900" fill="#cccccc">Ctrl_CMD</text>
 </svg>
