@@ -26,25 +26,26 @@ body{overflow:hidden}
     background:#000;
 }
 #titlebar{
-    height:38px;
-    min-height:38px;
+    height:40px;
+    min-height:40px;
     display:flex;
     align-items:center;
-    padding:0 12px;
-    background:#111;
-    border-bottom:1px solid #333;
-    color:#ddd;
+    padding:0 14px;
+    background:#080808;
+    border-bottom:2px solid #39ff14;
+    color:#39ff14;
+    text-shadow:0 0 6px #39ff14;
     font-family:"Segoe UI",Arial,sans-serif;
-    font-size:13px;
-    font-weight:600;
+    font-size:15px;
+    font-weight:700;
 }
 #terminal{
     flex:1;
     min-height:0;
     overflow-y:auto;
-    padding:12px 14px 20px;
-    font-size:19px;
-    line-height:1.45;
+    padding:14px 16px 20px;
+    font-size:20px;
+    line-height:1.5;
     font-weight:700;
     white-space:pre-wrap;
     word-break:break-word;
@@ -55,15 +56,17 @@ body{overflow:hidden}
 #inputArea{
     display:flex;
     align-items:center;
-    padding:0 14px 14px;
+    padding:0 16px 16px;
     background:#000;
+    border-top:1px solid #123d0b;
 }
 #prompt{
     flex:0 0 auto;
-    color:#fff;
-    font-size:16px;
-    line-height:1.45;
-    font-weight:700;
+    color:#39ff14;
+    text-shadow:0 0 7px #39ff14;
+    font-size:20px;
+    line-height:1.5;
+    font-weight:900;
     white-space:pre;
 }
 #commandInput{
@@ -74,16 +77,22 @@ body{overflow:hidden}
     background:transparent;
     color:#fff;
     font-family:Consolas,"Courier New",monospace;
-    font-size:16px;
-    line-height:1.45;
+    font-size:20px;
+    line-height:1.5;
     font-weight:700;
     padding:0;
-    caret-color:#fff;
+    caret-color:#39ff14;
+    text-shadow:0 0 3px rgba(255,255,255,.25);
+}
+#commandInput::selection{
+    background:#39ff14;
+    color:#000;
 }
 @media(max-width:600px){
     #terminal,#commandInput,#prompt{
         font-size:18px;
     }
+    #titlebar{font-size:14px}
 }
 </style>
 </head>
@@ -154,7 +163,7 @@ function normalizePath(path){
 }
 
 function resolvePath(target){
-    target=target.trim().replace(/^["']|["']$/g,"");
+    target=target.trim().replace(/^[\"']|[\"']$/g,"");
     if(!target) return currentPath;
 
     if(/^[A-Za-z]:\\/.test(target) || /^[A-Za-z]:$/.test(target)){
@@ -183,6 +192,7 @@ function commandDir(){
     print("");
     print(" Directory of "+currentPath);
     print("");
+
     const entries=folders[currentPath];
 
     if(!entries){
@@ -234,7 +244,6 @@ function execute(raw){
     const args=firstSpace===-1?"":command.slice(firstSpace+1);
 
     switch(name){
-
         case "help":
             commandHelp();
             break;
@@ -299,7 +308,7 @@ function execute(raw){
             break;
 
         default:
-            print("'+raw+' is not recognized as an internal or external command,");
+            print("'"+raw+"' is not recognized as an internal or external command,");
             print("operable program or batch file.");
             print("");
             break;
