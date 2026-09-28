@@ -1,12 +1,11 @@
-<svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 
     <rect
         width="512"
         height="512"
         rx="90"
-        fill="#050505"/>
+        fill="#050505"
+    />
 
     <rect
         x="45"
@@ -15,29 +14,44 @@
         height="422"
         rx="55"
         fill="#101010"
-        stroke="#333"
-        stroke-width="8"/>
+        stroke="#333333"
+        stroke-width="8"
+    />
 
     <text
         x="256"
-        y="235"
+        y="225"
         text-anchor="middle"
         font-family="monospace"
-        font-size="72"
-        font-weight="bold"
-        fill="#ffffff">
-        SUI
+        font-size="70"
+        font-weight="900"
+        fill="#39ff14"
+    >
+        USB
     </text>
 
     <text
         x="256"
-        y="310"
+        y="295"
         text-anchor="middle"
         font-family="monospace"
-        font-size="42"
-        font-weight="bold"
-        fill="#cccccc">
-        &gt;_
+        font-size="58"
+        font-weight="900"
+        fill="#ffffff"
+    >
+        -CMD
+    </text>
+
+    <text
+        x="256"
+        y="355"
+        text-anchor="middle"
+        font-family="monospace"
+        font-size="30"
+        font-weight="700"
+        fill="#888888"
+    >
+        TERMINAL
     </text>
 
 </svg>
